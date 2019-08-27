@@ -1,0 +1,24 @@
+{
+  "name": "gulp_web_project",
+  "version": "1.0.0",
+  "description": "gulp_web_project",
+  "main": "index.js",
+  "author": "Niklas Wagner",
+  "license": "UNLICENSED",
+  "keywords": [
+    "gulp_web_project"
+  ],
+  "devDependencies": {
+    "fs-extra": "^8.1.0",
+    "gulp": "^4.0.2",
+    "gulp-clean-css": "^4.2.0",
+    "gulp-cli": "^2.2.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-file-include": "^2.1.0",
+    "gulp-rename": "^1.4.0",
+    "gulp-sass": "^4.0.2",
+    "gulp-uglify": "^3.0.2",
+    "gulp-watch": "^5.0.1",
+    "node-sass": "^4.12.0"
+  }
+}
