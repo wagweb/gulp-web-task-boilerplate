@@ -1,240 +1,269 @@
-// --------------------------------------------------
-// GULP WEB PROJECT
-// by Niklas Wagner
-// GitHub: https://github.com/primumFlaw
-// --------------------------------------------------
-// Table of contents
-// 1. IMPORTS
-// 2. CONFIG
-// 3. GULP TASKS
-// 4. BUILD FUNCTIONS
-// 5. HELPER FUNCTIONS
-// --------------------------------------------------
-// gulp file include doku
-// https://www.npmjs.com/package/gulp-file-include
-// --------------------------------------------------
+// ================================================================================
+// Gulp Web Task (V:3.0)
+// by: Niklas Wagner
+// ----------------------------------------
+// INFO:
+// gulp file include doku: https://www.npmjs.com/package/gulp-file-include
+// ----------------------------------------
+// Table of contents:
+// CONFIG
+// HELPER FUNCTIONS
+// WORKER TASKS (PRIVATE)
+// INIT TASKS (PRIVATE)
+// EXPOSED TASKS (PUBLIC)
+// WATCH CONFIG
+// ================================================================================
 
-// ====================================================================================================
-// 1. IMPORTS
 
-// gulp
-const gulp = require("gulp"); 
+// node gulp import
+const gulp = require("gulp");
 
-// npm plugins
-const npmPlugin_fs = require("fs");
-const npmPlugin_fsExtra = require("fs-extra");
+// node fs extra import
+const fs = require("fs-extra");
 
-// gulp plugins
-const gulpPlugin_fileinclude = require("gulp-file-include");
-const gulpPlugin_sass = require("gulp-sass");
-const gulpPlugin_concat = require("gulp-concat");
-const gulpPlugin_watch = require("gulp-watch");
-const gulpPlugin_uglify = require("gulp-uglify");
-const gulpPlugin_clean_css = require("gulp-clean-css");
-const gulpPlugin_rename = require("gulp-rename");
- 
+// node browser sync import
+const browserSync = require("browser-sync").create();
 
-// ====================================================================================================
-// 2. CONFIG
+// node gulp module imports
+const gulp_fileInclude = require("gulp-file-include");
+const gulp_sass = require("gulp-sass");
+const gulp_rename = require("gulp-rename");
+const gulp_concat = require("gulp-concat");
+const gulp_uglify = require("gulp-uglify");
+const gulp_cleanCss = require("gulp-clean-css");
 
-var config = {
+// ================================================================================
+// CONFIG
+
+// config
+const config = {
 	// cli prefix
-	cli_prefix: "⚙️ GulpWebTask INFO:",
-	// path config
-	path_src: "../src/",
-	path_out: "../out/",
-	// src folder config
-	src_html_components_folder: "html.components/",
-	src_html_templates_folder: "html.templates/",
-	src_sass_folder: "assets.sass/",
-	src_js_folder: "assets.js/",
-	src_assets_folder: "assets/",
-	// out folder config
-	out_html_folder: "html/",
-	out_sass_folder: "assets/css/",
-	out_js_folder: "assets/js/",
-	out_assets_folder: "assets/",
-	// fileinclude
-	fileinclude_prefix: "@@",
-	// filenames
-	sass_src_file: "root.scss",
-	sass_out_filename: "css-build",
-	sass_out_filename_min: "css-build.min",
-	js_out_file: "js-build.js",
-	js_out_file_min: "js-build.min.js",
-}
- 
-// ====================================================================================================
-// 3. GULP TASKS
+	cli_prefix: "⚙️--GulpWebTask INFO:",
+	// base paths
+	pathSrc: "../src/",
+	pathOut: "../out/",
+	// src config
+	src: {
+		htmlComponentsPath: "html.components/",
+		htmlTemplatesPath: "html.templates/",
+		scssPath: "assets.scss/",
+		scssRootFile: "root.scss",
+		jsPath: "assets.js/",
+		assetsPath: "assets/",
+	},
+	// out config
+	out: {
+		htmlPath: "html/",
+		cssPath: "assets/css/",
+		cssOutFileName: "app",
+		cssOutFileNameMin: "app.min",
+		jsPath: "assets/js/",
+		jsOutFile: "app.js",
+		jsOutFileNameMin: "app.min",
+		assetsPath: "assets/",
+	},
+	// file include prefix
+	fileIncludePrefix: "@@",
+	// index content
+	indexContent: ''
+	+'<input type="text" placeholder="name-of-your-html-template" id="in-text">'
+	+'<input type="button" value="Browse" id="in-button">'
+	+'<script>'
+	+'window.addEventListener("load", function() {'
+	+'document.querySelector("#in-button").addEventListener("click", function() {'
+	+'window.location.href = window.location.origin '
+	+'+ "/html/" '
+	+'+ document.querySelector("#in-text").value '
+	+'+ ".html";'
+	+'});'
+	+'});'
+	+'</script>',
+};
 
-// default task
-gulp.task("default", function() {
-	cleanBuild();
-	build();
-	watch();
-	return Promise.resolve();
-});
+// ================================================================================
+// HELPER FUNCTIONS
 
-// build task
-gulp.task("build", function() {
-	cleanBuild();
-	build();
-	return Promise.resolve();
-});
-
-// ====================================================================================================
-// 4. BUILD FUNCTIONS
-
-// build
-function build() {
-	buildHtml();
-	buildSass();
-	buildSassMin();
-	buildJs();
-	buildJsMin();
-	buildAssets();
-}
-
-// build html
-function buildHtml() {
-	log("BUILD -> html");
-	// check directories
-	checkDirectory(config.path_src);
-	checkDirectory(config.path_src + config.src_html_components_folder);
-	checkDirectory(config.path_src + config.src_html_templates_folder);
-	// build
-	gulp.src(config.path_src + config.src_html_templates_folder + "**")
-    .pipe(gulpPlugin_fileinclude({prefix: config.fileinclude_prefix}))
-    .pipe(gulp.dest(config.path_out + config.out_html_folder));
-}
-
-// build sass 
-function buildSass() {
-	log("BUILD -> sass");
-	// check files
-	checkFile(config.path_src + config.src_sass_folder + config.sass_src_file);
-	// check directories
-	checkDirectory(config.path_src);
-	checkDirectory(config.path_src + config.src_sass_folder);
-	// build
-	gulp.src(config.path_src + config.src_sass_folder + config.sass_src_file)
-	.pipe(gulpPlugin_sass().on("error", gulpPlugin_sass.logError))
-	.pipe(gulpPlugin_rename({basename:config.sass_out_filename}))
-    .pipe(gulp.dest(config.path_out + config.out_sass_folder));
-}
-
-// build sass min
-function buildSassMin() {
-	log("BUILD -> sass min");
-	// check files
-	checkFile(config.path_src + config.src_sass_folder + config.sass_src_file);
-	// check directories
-	checkDirectory(config.path_src);
-	checkDirectory(config.path_src + config.src_sass_folder);
-	// build
-	gulp.src(config.path_src + config.src_sass_folder + config.sass_src_file)
-	.pipe(gulpPlugin_sass().on("error", gulpPlugin_sass.logError))
-	.pipe(gulpPlugin_clean_css())
-	.pipe(gulpPlugin_rename({basename:config.sass_out_filename_min}))
-    .pipe(gulp.dest(config.path_out + config.out_sass_folder));
-}
-
-// build js
-function buildJs() {
-	log("BUILD -> js");
-	// check directories
-	checkDirectory(config.path_src);
-	checkDirectory(config.path_src + config.src_js_folder);
-	// build
-	gulp.src(config.path_src + config.src_js_folder + "**")
-    .pipe(gulpPlugin_concat(config.js_out_file))
-	.pipe(gulp.dest(config.path_out + config.out_js_folder));
-}
-
-// build js min
-function buildJsMin(params) {
-	log("BUILD -> js min");
-	// check directories
-	checkDirectory(config.path_src);
-	checkDirectory(config.path_src + config.src_js_folder);
-	// build
-	gulp.src(config.path_src + config.src_js_folder + "**")
-	.pipe(gulpPlugin_concat(config.js_out_file_min))
-	.pipe(gulpPlugin_uglify())
-	.pipe(gulp.dest(config.path_out + config.out_js_folder));
-}
-
-// build assets
-function buildAssets() {
-	log("BUILD -> assets");
-	// check directories
-	checkDirectory(config.path_src);
-	checkDirectory(config.path_src + config.src_assets_folder);
-	// build
-	gulp.src(config.path_src + config.src_assets_folder + "**")
-	.pipe(gulp.dest(config.path_out + config.out_assets_folder));
-} 
-
-// ====================================================================================================
-// 5. HELPER FUNCTIONS
-
-// watch
-function watch() {           
-	var watchHtmlComponentsPath = config.path_src + config.src_html_components_folder + "**";
-	var watchHtmlTemplatesPath = config.path_src + config.src_html_templates_folder + "**";
-	var watchSassPath = config.path_src + config.src_sass_folder + "**";
-	var watchJsPath = config.path_src + config.src_js_folder + "**";
-	var watchAssetsPath = config.path_src + config.src_assets_folder + "**";
-	// watch html
-	log("WATCHING -> html");
-	gulpPlugin_watch(watchHtmlComponentsPath, function() {
-		buildHtml();
-	});
-	gulpPlugin_watch(watchHtmlTemplatesPath, function() {
-		buildHtml();
-	});
-	// watch sass      
-	log("WATCHING -> sass");  
-	gulpPlugin_watch(watchSassPath, function() {
-		buildSass();
-	});
-	// watch js
-	log("WATCHING -> js");
-	gulpPlugin_watch(watchJsPath, function() {
-		buildJs();
-	});
-	// watch assets
-	log("WATCHING -> assets"); 
-	gulpPlugin_watch(watchAssetsPath, function() {
-		buildAssets();
-	});
-}
-
-// clean build
-function cleanBuild() {
-	log("cleaning build (deletes out folder)");
-	if(npmPlugin_fs.existsSync(config.path_out)) {
-		npmPlugin_fsExtra.removeSync(config.path_out); 
+// helper ensure file
+function helper_ensureFile(path) {
+	if (!fs.pathExistsSync(path)) {
+		helperLog("creating file | rel path: " + path);
+		fs.ensureFileSync(path);
 	}
-}	
-
-// check directory
-function checkDirectory(path) {
-	if(!npmPlugin_fs.existsSync(path)) {
-		npmPlugin_fs.mkdirSync(path);
-		log("new folder created -> " + path);  
-	}   
 }
 
-// check file
-function checkFile(path) {
-	if(!npmPlugin_fs.existsSync(path)) {
-		npmPlugin_fsExtra.outputFileSync(path, "\n")
-		log("new file created -> " + path);  
-	}   
+// helper ensure file with content
+function helper_ensureFileWithContent(path, content) {
+	if (!fs.pathExistsSync(path)) {
+		helperLog("creating and filling file | rel path: " + path);
+		fs.ensureFileSync(path);
+		fs.outputFileSync(path, content);
+	}
 }
 
-// log
-function log(log) {
-	console.log(config.cli_prefix + " " + log);	
+// helper ensure dir
+function helper_ensureDir(path) {
+	if (!fs.pathExistsSync(path)) {
+		helperLog("creating dir | rel path: " + path);
+		fs.ensureDirSync(path);
+	}
+}
+
+// helper log
+function helperLog(log) {
+	console.log(config.cli_prefix + " " + log);
+}
+
+// ================================================================================
+// WORKER TASKS (PRIVATE)
+
+function workerBuildHtml() {
+	// logging
+	helperLog("building html");
+	// ensure
+	helper_ensureDir(config.pathSrc + config.src.htmlComponentsPath);
+	helper_ensureDir(config.pathSrc + config.src.htmlTemplatesPath);
+	// build
+	return gulp.src(config.pathSrc + config.src.htmlTemplatesPath + "**")
+    .pipe(gulp_fileInclude({prefix: config.fileIncludePrefix}))
+	.pipe(gulp.dest(config.pathOut + config.out.htmlPath))
+	.pipe(browserSync.reload({ stream: true }));
+}
+
+// worker build scss
+function workerBuildScss() {
+	// logging
+	helperLog("building scss");
+	// ensure
+	helper_ensureFile(config.pathSrc + config.src.scssPath + config.src.scssRootFile);
+	// build
+	return gulp.src(config.pathSrc + config.src.scssPath + config.src.scssRootFile)
+	.pipe(gulp_sass().on("error", gulp_sass.logError))
+	.pipe(gulp_rename({basename:config.out.cssOutFileName}))
+	.pipe(gulp.dest(config.pathOut + config.out.cssPath))
+	.pipe(browserSync.reload({ stream: true }));
+}
+
+// worker build scss min
+function workerBuildScssMin() {
+	// logging
+	helperLog("building scss min");
+	// ensure
+	helper_ensureFile(config.pathSrc + config.src.scssPath + config.src.scssRootFile);
+	// build
+	return gulp.src(config.pathSrc + config.src.scssPath + config.src.scssRootFile)
+	.pipe(gulp_sass().on("error", gulp_sass.logError))
+	.pipe(gulp_cleanCss())
+	.pipe(gulp_rename({basename:config.out.cssOutFileNameMin}))
+    .pipe(gulp.dest(config.pathOut + config.out.cssPath));
+}
+
+// worker build js
+function workerBuildJs() {
+	// logging
+	helperLog("building js");
+	// ensure
+	helper_ensureDir(config.pathSrc + config.src.jsPath);
+	// build
+	return gulp.src(config.pathSrc + config.src.jsPath + "**")
+    .pipe(gulp_concat(config.out.jsOutFile))
+	.pipe(gulp.dest(config.pathOut + config.out.jsPath))
+	.pipe(browserSync.reload({ stream: true }));
+}
+
+// worker build js min
+function workerBuildJsMin() {
+	// logging
+	helperLog("building js min");
+	// ensure
+	helper_ensureDir(config.pathSrc + config.src.jsPath);
+	// build
+	return gulp.src(config.pathSrc + config.src.jsPath + "**")
+	.pipe(gulp_concat(config.out.jsOutFile))
+	.pipe(gulp_uglify())
+	.pipe(gulp_rename({basename:config.out.jsOutFileNameMin}))
+	.pipe(gulp.dest(config.pathOut + config.out.jsPath));
+}
+
+// worker build assets
+function workerBuildAssets() {
+	// logging
+	helperLog("building assets");
+	// ensure
+	helper_ensureDir(config.pathSrc + config.src.assetsPath);
+	// build
+	return gulp.src(config.pathSrc + config.src.assetsPath + "**")
+	.pipe(gulp.dest(config.pathOut + config.out.assetsPath))
+	.pipe(browserSync.reload({ stream: true }));
+}
+
+// ================================================================================
+// INIT TASKS (PRIVATE)
+
+// init browser sync
+function initBrowserSync(cb) {
+	// logging
+	helperLog("starting browser sync");
+	// ensure
+	helper_ensureFileWithContent(config.pathOut + "index.html", config.indexContent);
+	// browser sync
+	browserSync.init({
+		server: {
+			baseDir: config.pathOut
+		},
+	});
+	// callback
+	cb();
+}
+
+// ================================================================================
+// EXPOSED TASKS (PUBLIC)
+
+// build dev
+exports["build-dev"] = gulp.series(
+	workerBuildHtml,
+	workerBuildScss,
+	workerBuildJs,
+	workerBuildAssets
+);
+
+// build prod
+exports["build-prod"] = gulp.series(
+	workerBuildHtml,
+	workerBuildScss,
+	workerBuildScssMin,
+	workerBuildJs,
+	workerBuildJsMin,
+	workerBuildAssets
+);
+
+// default
+exports["default"] = gulp.series(
+	workerBuildHtml,
+	workerBuildScss,
+	workerBuildScssMin,
+	workerBuildJs,
+	workerBuildJsMin,
+	workerBuildAssets,
+	initBrowserSync,
+	watch
+);
+
+// ================================================================================
+// WATCH
+
+function watch(cb) {
+	// paths
+	const watchHtmlComponentsPath = config.pathSrc + config.src.htmlComponentsPath + "**";
+	const watchHtmlTemplatesPath = config.pathSrc + config.src.htmlTemplatesPath + "**";
+	const watchScssPath = config.pathSrc + config.src.scssPath + "**";
+	const watchJsPath = config.pathSrc + config.src.jsPath + "**";
+	const watchAssetsPath = config.pathSrc + config.src.assetsPath + "**";
+	// watchers
+	gulp.watch(watchHtmlComponentsPath, gulp.series(workerBuildHtml)); 
+	gulp.watch(watchHtmlTemplatesPath, gulp.series(workerBuildHtml)); 
+	gulp.watch(watchScssPath, gulp.series(workerBuildScss)); 
+	gulp.watch(watchJsPath, gulp.series(workerBuildJs)); 
+	gulp.watch(watchAssetsPath, gulp.series(workerBuildAssets));
+	// callback
+	cb()
 }

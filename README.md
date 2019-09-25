@@ -19,15 +19,20 @@ $ npm install gulp -g
 $ npm install gulp-cli -g
 ```
 
-### Start a build by running
-
-```bash
-$ gulp build
-```
-
-### Start a build and watcher by running:
+### Start a build and watcher by running
 
 ```bash
 $ gulp
 ```
 
+### Start a dev build
+
+```bash
+$ gulp build-dev
+```
+
+### Start a prod build
+
+```bash
+$ gulp build-dev
+```
