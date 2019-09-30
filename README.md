@@ -19,6 +19,16 @@ $ npm install gulp -g
 $ npm install gulp-cli -g
 ```
 
+### Init the folder structure by running
+
+```bash
+$ gulp
+OR
+$ gulp build-dev
+OR
+$ gulp build-prod
+```
+
 ### Start the dev-build task and watcher/browser-sync by running
 
 ```bash
@@ -42,6 +52,12 @@ $ gulp build-prod
 ```bash
 $ gulp bundle
 ```
+
+<hr>
+
+### Needed modules, paths, names etc. can be configured under the config section inside the ./npm/gulpfile.js
+
+<hr>
 
 ### Package list
 
