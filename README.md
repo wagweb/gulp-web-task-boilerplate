@@ -9,7 +9,7 @@ https://nodejs.org/de/
 ### Install the NPM dependencies by running
 
 ```bash
-$ npm Install
+$ npm install
 ```
 
 ### Install gulp and gulp-cli by running (this will also generate the project folder structure)
