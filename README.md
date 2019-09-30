@@ -12,27 +12,50 @@ https://nodejs.org/de/
 $ npm install
 ```
 
-### Install gulp and gulp-cli by running (this will also generate the project folder structure)
+### Install gulp and gulp-cli by running
 
 ```bash
 $ npm install gulp -g
 $ npm install gulp-cli -g
 ```
 
-### Start a build and watcher by running
+### Start the dev-build task and watcher/browser-sync by running
 
 ```bash
 $ gulp
 ```
 
-### Start a dev build
+### Start the dev build task
 
 ```bash
 $ gulp build-dev
 ```
 
-### Start a prod build
+### Start the prod build task
 
 ```bash
-$ gulp build-dev
+$ gulp build-prod
 ```
+
+### Start the bundle task
+
+```bash
+$ gulp bundle
+```
+
+### Package list
+
+| Package Name      | Version |
+|-------------------|--------:|
+| gulp              | ^4.0.2  |
+| gulp-cli          | ^2.2.0  |
+| fs-extra          | ^8.1.0  |
+| typescript        | ^3.6.3  |
+| browser-sync      | ^2.26.7 |
+| gulp-clean-css    | ^4.2.0  |
+| gulp-concat       | ^2.6.1  |
+| gulp-file-include | ^2.1.0  |
+| gulp-rename       | ^1.4.0  |
+| gulp-sass         | ^4.0.2  |
+| gulp-typescript   | ^5.0.1  |
+| gulp-uglify       | ^3.0.2  |

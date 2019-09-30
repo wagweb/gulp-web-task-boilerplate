@@ -1,5 +1,5 @@
 // ================================================================================
-// Gulp Web Task (V:4.0)
+// Gulp Web Task (V:4.1)
 // by: Niklas Wagner
 // ----------------------------------------
 // INFO:
@@ -367,6 +367,10 @@ config.enable.assets ? taskArrays["build-prod"].push(workerBuildAssets):{};
 config.enable.tsJsBundle ? taskArrays["build-prod"].push(workerBuildJsTsBundle):{};
 config.enable.tsJsBundle ? taskArrays["build-prod"].push(workerBuildJsTsBundleMin):{};
 
+// fill task array bundle
+config.enable.tsJsBundle ? taskArrays["bundle"].push(workerBuildJsTsBundle):{};
+config.enable.tsJsBundle ? taskArrays["bundle"].push(workerBuildJsTsBundleMin):{};
+
 // fill task array default
 config.enable.html ? taskArrays["default"].push(workerBuildHtml):{};
 config.enable.scss ? taskArrays["default"].push(workerBuildScss):{};
@@ -387,6 +391,9 @@ exports["build-dev"] = gulp.series(taskArrays["build-dev"]);
 
 // build prod
 exports["build-prod"] = gulp.series(taskArrays["build-prod"]);
+
+// bundle
+exports["bundle"] = gulp.series(taskArrays["bundle"]);
 
 // default
 exports["default"] = gulp.series(taskArrays["default"]);
