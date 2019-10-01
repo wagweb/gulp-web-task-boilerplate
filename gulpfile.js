@@ -125,7 +125,7 @@ config.contentTsconfig = `
 		"`+ config.pathSrc + config.module.ts.srcPath + config.module.ts.srcFile +`"
 	],
 	"exclude": [
-		"./out"
+		"`+ config.pathOut +`"
 	],
 	"compilerOptions": {
 		"module": "commonjs",
