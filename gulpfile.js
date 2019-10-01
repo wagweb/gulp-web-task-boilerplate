@@ -441,7 +441,7 @@ function watch(cb) {
 		gulp.watch(watchJsPath, gulp.series(workerBuildJs)); 
 	}
 	// ts
-	if (config.enable.js) {
+	if (config.enable.ts) {
 		const watchTsPath = config.pathSrc + config.module.ts.srcPath + "**";
 		gulp.watch(watchTsPath, gulp.series(workerBuildTs)); 
 	}
