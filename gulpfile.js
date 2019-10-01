@@ -385,9 +385,6 @@ config.enable.tsJsBundle ? taskArrays["default"].push(workerBuildJsTsBundle):{};
 taskArrays["default"].push(initBrowserSync);
 taskArrays["default"].push(watch);
 
-console.log(taskArrays);
-
-
 // ================================================================================
 // EXPOSED TASKS (PUBLIC)
 
