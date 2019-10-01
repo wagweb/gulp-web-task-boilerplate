@@ -416,7 +416,6 @@ if (taskArrays["default"].length > 0) {
 	helperLog("bundle task not defined, to few modules active");
 }
 
-
 // ================================================================================
 // WATCH
 
