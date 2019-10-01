@@ -3,7 +3,7 @@
 // by: Niklas Wagner
 // ----------------------------------------
 // INFO:
-// gulp file include doku: https://www.npmjs.com/package/gulp-file-include
+// gulp file include docs: https://www.npmjs.com/package/gulp-file-include
 // ----------------------------------------
 // Table of contents:
 // CONFIG
