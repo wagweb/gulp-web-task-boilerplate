@@ -1,5 +1,5 @@
 // ================================================================================
-// Gulp Web Task (V:4.1)
+// Gulp Web Task (V:4.2)
 // by: Niklas Wagner
 // ----------------------------------------
 // INFO:
@@ -41,8 +41,8 @@ const config = {
 	// cli prefix
 	cli_prefix: "⚙️--GulpWebTask INFO:",
 	// base paths
-	pathSrc: "../src/",
-	pathOut: "../out/",
+	pathSrc: "./src/",
+	pathOut: "./out/",
 	// module config
 	module: {
 		// html
@@ -54,7 +54,7 @@ const config = {
 		// scss
 		scss: {
 			srcPath: "assets.scss/",
-			srcRootFile: "root.scss",
+			srcFile: "root.scss",
 			outPath: "assets/css/",
 			outFileName: "app",
 			outFileNameMin: "app.min",
@@ -69,7 +69,7 @@ const config = {
 		// ts
 		ts: {
 			srcPath: "assets.ts/",
-			srcRootFile: "root.ts",
+			srcFile: "root.ts",
 			outPath: "assets/js/",
 			outFileName: "app-ts",
 			outFileNameMin: "app-ts.min",
@@ -101,37 +101,38 @@ const config = {
 	},
 	// file include prefix
 	fileIncludePrefix: "@@",
-	// index content
-	indexContent: `
-	<input type="text" placeholder="name-of-your-html-template" id="in-text">
-	<input type="button" value="Browse" id="in-button">
-	<script>
-		window.addEventListener("load", function() {
-			document.querySelector("#in-button").addEventListener("click", function() {
-				window.location.href = window.location.origin 
-				+ "/html/" 
-				+ document.querySelector("#in-text").value 
-				+ ".html";
-			});
-		});
-	</script>`,
-	// tsconfig content
-	tsconfigContent: `
-	{
-		"files": [
-			"../src/assets.ts/root.ts",
-		],
-		"exclude": [
-			"node_modules",
-			"../out"
-		],
-		"compilerOptions": {
-			"noImplicitAny": true,
-			"target": "es5"
-		}
-	}
-	`,
 };
+
+// content index
+config.contentIndex = `
+<input type="text" placeholder="name-of-your-html-template" id="in-text">
+<input type="button" value="Browse" id="in-button">
+<script>
+	window.addEventListener("load", function() {
+		document.querySelector("#in-button").addEventListener("click", function() {
+			window.location.href = window.location.origin 
+			+ "/html/" 
+			+ document.querySelector("#in-text").value 
+			+ ".html";
+		});
+	});
+</script>`;
+
+// content tsconfig
+config.contentTsconfig = `
+{
+	"files": [
+		"`+ config.pathSrc + config.module.ts.srcPath + config.module.ts.srcFile +`"
+	],
+	"exclude": [
+		"./out"
+	],
+	"compilerOptions": {
+		"module": "commonjs",
+		"noImplicitAny": true,
+		"target": "es5"
+	}
+}`;
 
 // ================================================================================
 // HELPER FUNCTIONS
@@ -169,6 +170,7 @@ function helperLog(log) {
 // ================================================================================
 // WORKER TASKS (PRIVATE)
 
+// worker build html
 function workerBuildHtml() {
 	// logging
 	helperLog("building html");
@@ -187,9 +189,9 @@ function workerBuildScss() {
 	// logging
 	helperLog("building scss");
 	// ensure
-	helper_ensureFile(config.pathSrc + config.module.scss.srcPath + config.module.scss.srcRootFile);
+	helper_ensureFile(config.pathSrc + config.module.scss.srcPath + config.module.scss.srcFile);
 	// build
-	return gulp.src(config.pathSrc + config.module.scss.srcPath + config.module.scss.srcRootFile)
+	return gulp.src(config.pathSrc + config.module.scss.srcPath + config.module.scss.srcFile)
 	.pipe(gulp_sass().on("error", gulp_sass.logError))
 	.pipe(gulp_rename({basename:config.module.scss.outFileName}))
 	.pipe(gulp.dest(config.pathOut + config.module.scss.outPath))
@@ -201,9 +203,9 @@ function workerBuildScssMin() {
 	// logging
 	helperLog("building scss min");
 	// ensure
-	helper_ensureFile(config.pathSrc + config.module.scss.srcPath + config.module.scss.srcRootFile);
+	helper_ensureFile(config.pathSrc + config.module.scss.srcPath + config.module.scss.srcFile);
 	// build
-	return gulp.src(config.pathSrc + config.module.scss.srcPath + config.module.scss.srcRootFile)
+	return gulp.src(config.pathSrc + config.module.scss.srcPath + config.module.scss.srcFile)
 	.pipe(gulp_sass().on("error", gulp_sass.logError))
 	.pipe(gulp_cleanCss())
 	.pipe(gulp_rename({basename:config.module.scss.outFileNameMin}))
@@ -242,8 +244,8 @@ function workerBuildTs() {
 	// logging
 	helperLog("building typescript");
 	// ensure
-	helper_ensureFile(config.pathSrc + config.module.ts.srcPath + config.module.ts.srcRootFile);
-	helper_ensureFileWithContent("./tsconfig.json", config.tsconfigContent);
+	helper_ensureFile(config.pathSrc + config.module.ts.srcPath + config.module.ts.srcFile);
+	helper_ensureFileWithContent("./tsconfig.json", config.contentTsconfig);
 	// create typescript instance
 	var tsInstance = gulp_typescript.createProject("tsconfig.json");
 	// build
@@ -260,8 +262,8 @@ function workerBuildTsMin() {
 	// logging
 	helperLog("building typescript min");
 	// ensure
-	helper_ensureFile(config.pathSrc + config.module.ts.srcPath + config.module.ts.srcRootFile);
-	helper_ensureFileWithContent("./tsconfig.json", config.tsconfigContent);
+	helper_ensureFile(config.pathSrc + config.module.ts.srcPath + config.module.ts.srcFile);
+	helper_ensureFileWithContent("./tsconfig.json", config.contentTsconfig);
 	// create typescript instance
 	var tsInstance = gulp_typescript.createProject("tsconfig.json");
 	// build
@@ -326,7 +328,7 @@ function initBrowserSync(cb) {
 	// logging
 	helperLog("starting browser sync");
 	// ensure
-	helper_ensureFileWithContent(config.pathOut + "index.html", config.indexContent);
+	helper_ensureFileWithContent(config.pathOut + "index.html", config.contentIndex);
 	// browser sync
 	browserSync.init({
 		server: {
@@ -383,20 +385,40 @@ config.enable.tsJsBundle ? taskArrays["default"].push(workerBuildJsTsBundle):{};
 taskArrays["default"].push(initBrowserSync);
 taskArrays["default"].push(watch);
 
+console.log(taskArrays);
+
+
 // ================================================================================
 // EXPOSED TASKS (PUBLIC)
 
 // build dev
-exports["build-dev"] = gulp.series(taskArrays["build-dev"]);
+if (taskArrays["build-dev"].length > 0) {
+	exports["build-dev"] = gulp.series(taskArrays["build-dev"]);
+} else {
+	helperLog("build-dev task not defined, to few modules active");
+}
 
 // build prod
-exports["build-prod"] = gulp.series(taskArrays["build-prod"]);
+if (taskArrays["build-prod"].length > 0) {
+	exports["build-prod"] = gulp.series(taskArrays["build-prod"]);
+} else {
+	helperLog("build-prod task not defined, to few modules active");
+}
 
 // bundle
-exports["bundle"] = gulp.series(taskArrays["bundle"]);
+if (taskArrays["bundle"].length > 0) {
+	exports["bundle"] = gulp.series(taskArrays["bundle"]);
+} else {
+	helperLog("bundle task not defined, to few modules active");
+}
 
 // default
-exports["default"] = gulp.series(taskArrays["default"]);
+if (taskArrays["default"].length > 0) {
+	exports["default"] = gulp.series(taskArrays["default"]);
+} else {
+	helperLog("bundle task not defined, to few modules active");
+}
+
 
 // ================================================================================
 // WATCH

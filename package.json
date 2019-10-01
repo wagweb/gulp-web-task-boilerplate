@@ -3,12 +3,10 @@
   "version": "1.0.0",
   "description": "gulp-web-task",
   "main": "gulpfile.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "author": "Niklas Wagner",
   "license": "UNLICENSED",
   "devDependencies": {
+    "@types/node": "^12.7.8",
     "browser-sync": "^2.26.7",
     "fs-extra": "^8.1.0",
     "gulp": "^4.0.2",

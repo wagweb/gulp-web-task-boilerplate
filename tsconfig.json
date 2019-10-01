@@ -1,0 +1,14 @@
+
+{
+	"files": [
+		"./src/assets.ts/root.ts"
+	],
+	"exclude": [
+		"./out"
+	],
+	"compilerOptions": {
+		"module": "commonjs",
+		"noImplicitAny": true,
+		"target": "es5"
+	}
+}

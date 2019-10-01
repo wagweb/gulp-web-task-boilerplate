@@ -55,7 +55,7 @@ $ gulp bundle
 
 <hr>
 
-### Needed modules, paths, names etc. can be configured under the config section inside the ./npm/gulpfile.js
+### Needed modules, paths, names etc. can be configured under the config section inside the gulpfile.js file
 
 <hr>
 
@@ -75,3 +75,4 @@ $ gulp bundle
 | gulp-sass         | ^4.0.2  |
 | gulp-typescript   | ^5.0.1  |
 | gulp-uglify       | ^3.0.2  |
+| @types/node       | ^12.7.8 |
