@@ -134,12 +134,12 @@ config.contentIndex = `
 config.contentTsconfig = `
 {
 	"files": [
-		` + config.pathSrc + config.module.ts.srcPath + config.module.ts.outFile + `
+		` + '"' + config.pathSrc + config.module.ts.srcPath + config.module.ts.outFile + '"' + `
 	],
 	"exclude": [
-		` + config.pathOut + `
+		` + '"' + config.pathOut + '"' + `
 	],
-	"compilerOptions": ` + config.module.ts.compilerOptions + `
+	"compilerOptions": ` + JSON.stringify(config.module.ts.compilerOptions) + `
 }`;
 
 // ================================================================================
