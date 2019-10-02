@@ -400,21 +400,21 @@ taskArrays["default"].push(watch);
 if (taskArrays["build-dev"].length > 0) {
 	exports["build-dev"] = gulp.series(taskArrays["build-dev"]);
 } else {
-	helperLog("build-dev task not defined, to few modules active");
+	helperLog("build-dev was task not defined, to few modules active");
 }
 
 // build prod
 if (taskArrays["build-prod"].length > 0) {
 	exports["build-prod"] = gulp.series(taskArrays["build-prod"]);
 } else {
-	helperLog("build-prod task not defined, to few modules active");
+	helperLog("build-prod was task not defined, to few modules active");
 }
 
 // default
 if (taskArrays["default"].length > 0) {
 	exports["default"] = gulp.series(taskArrays["default"]);
 } else {
-	helperLog("bundle task not defined, to few modules active");
+	helperLog("default was task not defined, to few modules active");
 }
 
 // ================================================================================
