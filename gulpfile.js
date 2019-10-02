@@ -1,5 +1,5 @@
 // ================================================================================
-// Gulp Web Task (V:4.2)
+// Gulp Web Task (V:5.0)
 // by: Niklas Wagner
 // ----------------------------------------
 // INFO:
@@ -24,6 +24,14 @@ const fs = require("fs-extra");
 // node browser sync import
 const browserSync = require("browser-sync").create();
 
+// node browserify/tsify imports
+const browserify = require("browserify");
+const tsify = require("tsify");
+
+// vinyl stream/buffer imports
+const vinylSourceStream = require("vinyl-source-stream");
+const vinylBuffer = require("vinyl-buffer");
+
 // node gulp module imports
 const gulp_fileInclude = require("gulp-file-include");
 const gulp_sass = require("gulp-sass");
@@ -31,7 +39,6 @@ const gulp_rename = require("gulp-rename");
 const gulp_concat = require("gulp-concat");
 const gulp_uglify = require("gulp-uglify");
 const gulp_cleanCss = require("gulp-clean-css");
-const gulp_typescript = require("gulp-typescript");
 
 // ================================================================================
 // CONFIG
@@ -71,8 +78,13 @@ const config = {
 			srcPath: "assets.ts/",
 			srcFile: "root.ts",
 			outPath: "assets/js/",
-			outFileName: "app-ts",
-			outFileNameMin: "app-ts.min",
+			outFile: "app-ts.js",
+			outFileMin: "app-ts.min.js",
+			compilerOptions: {
+				"module": "commonJs",
+				"target": "ES5",
+				"moduleResolution": "node"
+			},
 		},
 		// assets
 		assets: {
@@ -122,16 +134,12 @@ config.contentIndex = `
 config.contentTsconfig = `
 {
 	"files": [
-		"`+ config.pathSrc + config.module.ts.srcPath + config.module.ts.srcFile +`"
+		` + config.pathSrc + config.module.ts.srcPath + config.module.ts.outFile + `
 	],
 	"exclude": [
-		"`+ config.pathOut +`"
+		` + config.pathOut + `
 	],
-	"compilerOptions": {
-		"module": "commonjs",
-		"noImplicitAny": true,
-		"target": "es5"
-	}
+	"compilerOptions": ` + config.module.ts.compilerOptions + `
 }`;
 
 // ================================================================================
@@ -246,13 +254,15 @@ function workerBuildTs() {
 	// ensure
 	helper_ensureFile(config.pathSrc + config.module.ts.srcPath + config.module.ts.srcFile);
 	helper_ensureFileWithContent("./tsconfig.json", config.contentTsconfig);
-	// create typescript instance
-	var tsInstance = gulp_typescript.createProject("tsconfig.json");
 	// build
-	return tsInstance.src()
-	.pipe(tsInstance())
-	.js
-	.pipe(gulp_rename({basename:config.module.ts.outFileName}))
+	return browserify({
+		entries: config.pathSrc + config.module.ts.srcPath + config.module.ts.srcFile,
+		debug: true
+	})
+	.plugin(tsify, { noImplicitAny: true })
+	.bundle()
+	.pipe(vinylSourceStream(config.module.ts.outFile))
+	.pipe(vinylBuffer())
 	.pipe(gulp.dest(config.pathOut + config.module.ts.outPath))
 	.pipe(browserSync.reload({ stream: true }));
 }
@@ -264,15 +274,18 @@ function workerBuildTsMin() {
 	// ensure
 	helper_ensureFile(config.pathSrc + config.module.ts.srcPath + config.module.ts.srcFile);
 	helper_ensureFileWithContent("./tsconfig.json", config.contentTsconfig);
-	// create typescript instance
-	var tsInstance = gulp_typescript.createProject("tsconfig.json");
 	// build
-	return tsInstance.src()
-	.pipe(tsInstance())
-	.js
+	return browserify({
+		entries: config.pathSrc + config.module.ts.srcPath + config.module.ts.srcFile,
+		debug: true
+	})
+	.plugin(tsify, { noImplicitAny: true })
+	.bundle()
+	.pipe(vinylSourceStream(config.module.ts.outFileMin))
+	.pipe(vinylBuffer())
 	.pipe(gulp_uglify())
-	.pipe(gulp_rename({basename:config.module.ts.outFileNameMin}))
-	.pipe(gulp.dest(config.pathOut + config.module.ts.outPath));
+	.pipe(gulp.dest(config.pathOut + config.module.ts.outPath))
+	.pipe(browserSync.reload({ stream: true }));
 }
 
 // worker build assets
@@ -346,7 +359,6 @@ function initBrowserSync(cb) {
 const taskArrays = {
 	"build-dev": [],
 	"build-prod": [],
-	"bundle": [],
 	"default": [],
 }
 
@@ -368,10 +380,6 @@ config.enable.ts ? taskArrays["build-prod"].push(workerBuildTsMin):{};
 config.enable.assets ? taskArrays["build-prod"].push(workerBuildAssets):{};
 config.enable.tsJsBundle ? taskArrays["build-prod"].push(workerBuildJsTsBundle):{};
 config.enable.tsJsBundle ? taskArrays["build-prod"].push(workerBuildJsTsBundleMin):{};
-
-// fill task array bundle
-config.enable.tsJsBundle ? taskArrays["bundle"].push(workerBuildJsTsBundle):{};
-config.enable.tsJsBundle ? taskArrays["bundle"].push(workerBuildJsTsBundleMin):{};
 
 // fill task array default
 config.enable.html ? taskArrays["default"].push(workerBuildHtml):{};
@@ -400,13 +408,6 @@ if (taskArrays["build-prod"].length > 0) {
 	exports["build-prod"] = gulp.series(taskArrays["build-prod"]);
 } else {
 	helperLog("build-prod task not defined, to few modules active");
-}
-
-// bundle
-if (taskArrays["bundle"].length > 0) {
-	exports["bundle"] = gulp.series(taskArrays["bundle"]);
-} else {
-	helperLog("bundle task not defined, to few modules active");
 }
 
 // default
