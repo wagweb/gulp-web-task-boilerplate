@@ -373,6 +373,7 @@ config.enable.tsJsBundle ? taskArrays["build-dev"].push(workerBuildJsTsBundle):{
 // fill task array build prod
 config.enable.html ? taskArrays["build-prod"].push(workerBuildHtml):{};
 config.enable.scss ? taskArrays["build-prod"].push(workerBuildScss):{};
+config.enable.scss ? taskArrays["build-prod"].push(workerBuildScssMin) : {};
 config.enable.js ? taskArrays["build-prod"].push(workerBuildJs):{};
 config.enable.js ? taskArrays["build-prod"].push(workerBuildJsMin):{};
 config.enable.ts ? taskArrays["build-prod"].push(workerBuildTs):{};
